@@ -1,0 +1,119 @@
+{
+  "theme": "light",
+  "archetype": "Archetype 4 (Swiss & High-Contrast) + Deep Blue Premium SaaS",
+  "colors": {
+    "brand": {
+      "primary": "#0A2540",
+      "primary_hover": "#103154",
+      "secondary": "#2563EB",
+      "accent": "#38BDF8"
+    },
+    "backgrounds": {
+      "app": "#F8FAFC",
+      "surface": "#FFFFFF",
+      "sidebar": "#0A2540",
+      "header_glass": "rgba(255, 255, 255, 0.7)"
+    },
+    "text": {
+      "heading": "#0F172A",
+      "body": "#475569",
+      "muted": "#64748B",
+      "sidebar_text": "#94A3B8",
+      "sidebar_hover": "#FFFFFF",
+      "sidebar_active": "#FFFFFF"
+    },
+    "borders": {
+      "default": "#E2E8F0",
+      "focus": "#2563EB",
+      "sidebar": "#1E3A8A"
+    },
+    "status": {
+      "new": {
+        "bg": "#F1F5F9",
+        "text": "#334155",
+        "border": "#E2E8F0"
+      },
+      "paid": {
+        "bg": "#D1FAE5",
+        "text": "#047857",
+        "border": "#A7F3D0"
+      },
+      "shipped": {
+        "bg": "#DBEAFE",
+        "text": "#1D4ED8",
+        "border": "#BFDBFE"
+      }
+    }
+  },
+  "typography": {
+    "fonts": {
+      "heading": "Outfit, sans-serif",
+      "body": "Inter, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "rules": {
+      "h1": "text-3xl sm:text-4xl tracking-tight font-semibold",
+      "h2": "text-2xl sm:text-3xl tracking-tight font-semibold",
+      "h3": "text-xl sm:text-2xl tracking-tight font-medium",
+      "card_title": "text-base font-semibold text-slate-900 tracking-tight",
+      "body": "text-sm text-slate-600 leading-relaxed",
+      "label": "text-xs font-semibold tracking-wider uppercase text-slate-500",
+      "number": "text-3xl font-bold tracking-tighter text-slate-900"
+    }
+  },
+  "layout": {
+    "strategy": "Control Room Grid (Dense, Functional)",
+    "sidebar": "w-64 fixed h-screen bg-brand-primary text-slate-200 border-r border-brand-primary",
+    "main_content": "ml-0 md:ml-64 min-h-screen bg-slate-50",
+    "header": "h-16 sticky top-0 z-50 backdrop-blur-xl bg-white/70 border-b border-slate-200 flex items-center px-4 md:px-8",
+    "grid": {
+      "dashboard_stats": "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6",
+      "dashboard_main": "grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6"
+    },
+    "spacing": {
+      "section_padding": "p-6 md:p-8",
+      "card_padding": "p-6"
+    }
+  },
+  "components": {
+    "card": "bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200",
+    "button_primary": "bg-[#0A2540] text-white hover:bg-[#103154] rounded-lg px-4 py-2 font-medium transition-colors focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2",
+    "button_secondary": "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 rounded-lg px-4 py-2 font-medium transition-colors",
+    "table": "w-full text-left text-sm whitespace-nowrap",
+    "table_header": "bg-slate-50 text-slate-500 font-semibold border-b border-slate-200",
+    "table_row": "border-b border-slate-100 hover:bg-slate-50/50 transition-colors",
+    "input": "w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-shadow bg-white",
+    "badge_base": "px-2.5 py-0.5 rounded-full text-xs font-medium border"
+  },
+  "interactions": {
+    "hover_state": "All interactive elements must change background or border color on hover, plus cursor-pointer.",
+    "focus_state": "Inputs and buttons must use high-contrast focus rings (e.g., focus:ring-[#2563EB]).",
+    "transitions": "Use 'transition-all duration-200 ease-in-out' on cards and buttons."
+  },
+  "media": {
+    "login_background": {
+      "url": "https://images.unsplash.com/photo-1759914514194-b5883244e683?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MDV8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGRlZXAlMjBibHVlJTIwZ3JhZGllbnQlMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc3NDk0NzU5MHww&ixlib=rb-4.1.0&q=85",
+      "description": "Abstract deep blue gradient background used for the right half of the split-screen auth pages (Login/Register)."
+    }
+  },
+  "icons": {
+    "library": "@phosphor-icons/react",
+    "installation": "yarn add @phosphor-icons/react"
+  },
+  "accessibility": {
+    "contrast": "Ensure all text meets minimum 4.5:1 ratio. Button texts must be pure white over #0A2540.",
+    "testing": "All interactive elements MUST include a `data-testid` attribute (e.g., `data-testid=\"login-submit-button\"`)."
+  },
+  "instructions_to_main_agent": [
+    "Build standard SaaS layout: Sidebar (Left, Fixed, deep blue #0A2540) + Main Content (Right).",
+    "Mobile Responsive: Sidebar should collapse into a Hamburger menu on mobile.",
+    "Use Shadcn UI for standard components (Tables, Dialogs, Dropdowns, Inputs, Badges).",
+    "Apply 'Outfit' font to all Headings, and 'Inter' to body text. Import them via Google Fonts in index.css or tailwind.config.",
+    "Use the 'badge_base' and status colors to dynamically render New/Paid/Shipped states.",
+    "Ensure all data tables have empty states clearly designed with an icon and soft text.",
+    "Use `react-router-dom` for navigation between Dashboard, Customers, Orders, Reminders.",
+    "Implement split-screen login page using `media.login_background.url` for the visual half.",
+    "Ensure total counts on the Dashboard stretch properly and use 'number' typography rule.",
+    "Do NOT use 'Inter' for headings. Do NOT use default blue for the sidebar, strictly use `#0A2540`."
+  ]
+}
