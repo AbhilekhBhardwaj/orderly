@@ -3,7 +3,6 @@ import { ordersAPI, customersAPI, formatApiErrorDetail } from '@/lib/api';
 import { Plus, Search, Edit2, Trash2, ShoppingBag } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
@@ -13,12 +12,7 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table';
-
-const statusStyles = {
-  New: 'bg-[#F1F5F9] text-[#334155] border-[#E2E8F0]',
-  Paid: 'bg-[#D1FAE5] text-[#047857] border-[#A7F3D0]',
-  Shipped: 'bg-[#DBEAFE] text-[#1D4ED8] border-[#BFDBFE]',
-};
+import { EmptyState, PageHeader, PrimaryButton, SecondaryButton, StatusBadge, SurfaceCard } from '@/components/app/SaasUI';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -112,27 +106,21 @@ export default function OrdersPage() {
   if (loading) return (
     <div className="space-y-6 animate-pulse" data-testid="orders-loading">
       <div className="h-8 bg-slate-200 rounded w-48"></div>
-      <div className="h-96 bg-slate-100 rounded-xl"></div>
+      <div className="h-96 bg-slate-100 rounded-2xl"></div>
     </div>
   );
 
   return (
     <div className="space-y-6" data-testid="orders-page">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl sm:text-4xl tracking-tight font-semibold text-[#0F172A]" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            Orders
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">{orders.length} total orders</p>
-        </div>
-        <button
-          onClick={openCreate}
-          data-testid="add-order-button"
-          className="bg-[#0A2540] text-white hover:bg-[#103154] rounded-lg px-4 py-2.5 font-medium transition-colors focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2 flex items-center gap-2 text-sm"
-        >
-          <Plus className="w-4 h-4" /> Add Order
-        </button>
-      </div>
+      <PageHeader
+        title="Orders"
+        subtitle={`${orders.length} total orders`}
+        action={(
+          <PrimaryButton onClick={openCreate} data-testid="add-order-button">
+            <Plus className="w-4 h-4" /> Add Order
+          </PrimaryButton>
+        )}
+      />
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -142,12 +130,12 @@ export default function OrdersPage() {
             placeholder="Search orders..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 h-10 border-slate-200"
+            className="h-11 rounded-xl border-slate-200 pl-9"
             data-testid="order-search-input"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[140px] h-10 border-slate-200" data-testid="order-status-filter">
+          <SelectTrigger className="h-11 w-[150px] rounded-xl border-slate-200" data-testid="order-status-filter">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -160,14 +148,14 @@ export default function OrdersPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden" data-testid="orders-table-container">
+      <SurfaceCard className="overflow-hidden" data-testid="orders-table-container">
         {filtered.length === 0 ? (
-          <div className="text-center py-16">
-            <ShoppingBag className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <p className="text-sm font-medium text-slate-900">No orders found</p>
-            <p className="text-sm text-slate-500 mt-1">
-              {search || statusFilter !== 'all' ? 'Try different filters' : 'Create your first order to get started'}
-            </p>
+          <div className="p-6">
+            <EmptyState
+              icon={ShoppingBag}
+              title="No orders found"
+              description={search || statusFilter !== 'all' ? 'Try different filters.' : 'Create your first order to get started.'}
+            />
           </div>
         ) : (
           <Table>
@@ -183,14 +171,12 @@ export default function OrdersPage() {
             </TableHeader>
             <TableBody>
               {filtered.map((order) => (
-                <TableRow key={order.id} className="hover:bg-slate-50/50" data-testid={`order-row-${order.id}`}>
+                <TableRow key={order.id} className="h-16 hover:bg-slate-50/50" data-testid={`order-row-${order.id}`}>
                   <TableCell className="font-medium text-slate-900">{order.product_name}</TableCell>
                   <TableCell className="text-sm text-slate-600">{order.customer_name}</TableCell>
                   <TableCell className="text-sm font-semibold text-slate-900">${order.amount}</TableCell>
                   <TableCell>
-                    <Badge className={`${statusStyles[order.status]} border text-xs px-2.5 py-0.5 rounded-full`}>
-                      {order.status}
-                    </Badge>
+                    <StatusBadge status={order.status} />
                   </TableCell>
                   <TableCell className="hidden sm:table-cell text-sm text-slate-500">
                     {new Date(order.created_at).toLocaleDateString()}
@@ -199,14 +185,14 @@ export default function OrdersPage() {
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => openEdit(order)}
-                        className="p-2 rounded-lg hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700"
+                        className="p-2 rounded-xl hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700"
                         data-testid={`edit-order-${order.id}`}
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => { setDeleting(order); setDeleteDialogOpen(true); }}
-                        className="p-2 rounded-lg hover:bg-red-50 transition-colors text-slate-500 hover:text-red-600"
+                        className="p-2 rounded-xl hover:bg-red-50 transition-colors text-slate-500 hover:text-red-600"
                         data-testid={`delete-order-${order.id}`}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -218,11 +204,11 @@ export default function OrdersPage() {
             </TableBody>
           </Table>
         )}
-      </div>
+      </SurfaceCard>
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-2xl">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>
               {editing ? 'Edit Order' : 'Create Order'}
@@ -236,7 +222,7 @@ export default function OrdersPage() {
               <div className="space-y-2">
                 <Label className="text-xs font-semibold tracking-wider uppercase text-slate-500">Customer *</Label>
                 <Select value={form.customer_id} onValueChange={(val) => setForm({...form, customer_id: val})}>
-                  <SelectTrigger data-testid="order-customer-select" className="border-slate-200">
+                  <SelectTrigger data-testid="order-customer-select" className="h-11 rounded-xl border-slate-200">
                     <SelectValue placeholder="Select customer" />
                   </SelectTrigger>
                   <SelectContent>
@@ -255,7 +241,7 @@ export default function OrdersPage() {
                 placeholder="e.g. Silk Saree - Blue"
                 required
                 data-testid="order-product-input"
-                className="border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+                className="h-11 rounded-xl border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
               />
             </div>
             <div className="space-y-2">
@@ -268,13 +254,13 @@ export default function OrdersPage() {
                 placeholder="0.00"
                 required
                 data-testid="order-amount-input"
-                className="border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+                className="h-11 rounded-xl border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
               />
             </div>
             <div className="space-y-2">
               <Label className="text-xs font-semibold tracking-wider uppercase text-slate-500">Status</Label>
               <Select value={form.status} onValueChange={(val) => setForm({...form, status: val})}>
-                <SelectTrigger data-testid="order-status-select" className="border-slate-200">
+                <SelectTrigger data-testid="order-status-select" className="h-11 rounded-xl border-slate-200">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -286,21 +272,16 @@ export default function OrdersPage() {
             </div>
             {error && <p className="text-sm text-red-600" data-testid="order-form-error">{error}</p>}
             <DialogFooter>
-              <button
-                type="button"
-                onClick={() => setDialogOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-              >
+              <SecondaryButton type="button" onClick={() => setDialogOpen(false)}>
                 Cancel
-              </button>
-              <button
+              </SecondaryButton>
+              <PrimaryButton
                 type="submit"
                 disabled={submitting || (!editing && !form.customer_id)}
                 data-testid="order-form-submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-[#0A2540] rounded-lg hover:bg-[#103154] transition-colors disabled:opacity-50"
               >
                 {submitting ? 'Saving...' : (editing ? 'Update' : 'Create')}
-              </button>
+              </PrimaryButton>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -308,7 +289,7 @@ export default function OrdersPage() {
 
       {/* Delete Confirmation */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent className="sm:max-w-sm rounded-2xl">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>Delete Order</DialogTitle>
             <DialogDescription>
@@ -316,16 +297,13 @@ export default function OrdersPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <button
-              onClick={() => setDeleteDialogOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-            >
+            <SecondaryButton onClick={() => setDeleteDialogOpen(false)}>
               Cancel
-            </button>
+            </SecondaryButton>
             <button
               onClick={handleDelete}
               data-testid="confirm-delete-order"
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-medium text-white transition-colors hover:bg-red-700"
             >
               Delete
             </button>

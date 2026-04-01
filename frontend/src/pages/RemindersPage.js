@@ -3,7 +3,6 @@ import { remindersAPI, customersAPI, formatApiErrorDetail } from '@/lib/api';
 import { Plus, Trash2, Bell, Clock, CalendarDays, Edit2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
@@ -14,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
+import { EmptyState, PageHeader, PrimaryButton, SecondaryButton, SurfaceCard } from '@/components/app/SaasUI';
 
 export default function RemindersPage() {
   const [reminders, setReminders] = useState([]);
@@ -111,35 +111,29 @@ export default function RemindersPage() {
   if (loading) return (
     <div className="space-y-6 animate-pulse" data-testid="reminders-loading">
       <div className="h-8 bg-slate-200 rounded w-48"></div>
-      <div className="h-96 bg-slate-100 rounded-xl"></div>
+      <div className="h-96 bg-slate-100 rounded-2xl"></div>
     </div>
   );
 
   return (
     <div className="space-y-6" data-testid="reminders-page">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl sm:text-4xl tracking-tight font-semibold text-[#0F172A]" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            Reminders
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">{reminders.length} {filter === 'today' ? "due today" : "total reminders"}</p>
-        </div>
-        <button
-          onClick={openCreate}
-          data-testid="add-reminder-button"
-          className="bg-[#0A2540] text-white hover:bg-[#103154] rounded-lg px-4 py-2.5 font-medium transition-colors focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2 flex items-center gap-2 text-sm"
-        >
-          <Plus className="w-4 h-4" /> Add Reminder
-        </button>
-      </div>
+      <PageHeader
+        title="Reminders"
+        subtitle={`${reminders.length} ${filter === 'today' ? 'due today' : 'total reminders'}`}
+        action={(
+          <PrimaryButton onClick={openCreate} data-testid="add-reminder-button">
+            <Plus className="w-4 h-4" /> Add Reminder
+          </PrimaryButton>
+        )}
+      />
 
       {/* Filter */}
       <div className="flex gap-2">
         <button
           onClick={() => setFilter('all')}
           data-testid="filter-all-reminders"
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            filter === 'all' ? 'bg-[#0A2540] text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+          className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+            filter === 'all' ? 'bg-[#0A2540] text-white shadow-sm' : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
           }`}
         >
           All
@@ -147,8 +141,8 @@ export default function RemindersPage() {
         <button
           onClick={() => setFilter('today')}
           data-testid="filter-today-reminders"
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            filter === 'today' ? 'bg-[#0A2540] text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+          className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+            filter === 'today' ? 'bg-[#0A2540] text-white shadow-sm' : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
           }`}
         >
           Due Today
@@ -158,19 +152,17 @@ export default function RemindersPage() {
       {/* Reminders List */}
       <div className="space-y-3" data-testid="reminders-list">
         {reminders.length === 0 ? (
-          <div className="bg-white border border-slate-200 rounded-xl text-center py-16">
-            <Bell className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <p className="text-sm font-medium text-slate-900">No reminders found</p>
-            <p className="text-sm text-slate-500 mt-1">
-              {filter === 'today' ? 'No reminders due today' : 'Create your first reminder'}
-            </p>
-          </div>
+          <EmptyState
+            icon={Bell}
+            title="No reminders found"
+            description={filter === 'today' ? 'No reminders due today.' : 'Create your first reminder.'}
+          />
         ) : (
           reminders.map((reminder) => (
-            <div
+            <SurfaceCard
               key={reminder.id}
-              className={`bg-white border rounded-xl p-5 transition-all duration-200 hover:shadow-md ${
-                isToday(reminder.date_time) ? 'border-[#2563EB] border-l-4' : 'border-slate-200'
+              className={`p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(15,23,42,0.08)] ${
+                isToday(reminder.date_time) ? 'ring-2 ring-blue-200 ring-offset-1' : ''
               } ${isPast(reminder.date_time) && !isToday(reminder.date_time) ? 'opacity-60' : ''}`}
               data-testid={`reminder-card-${reminder.id}`}
             >
@@ -192,9 +184,9 @@ export default function RemindersPage() {
                         {reminder.customer_name}
                       </span>
                       {isToday(reminder.date_time) && (
-                        <Badge className="bg-[#DBEAFE] text-[#1D4ED8] border-[#BFDBFE] border text-xs px-2 py-0.5 rounded-full">
+                        <span className="rounded-full border border-blue-200 bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
                           Due Today
-                        </Badge>
+                        </span>
                       )}
                     </div>
                   </div>
@@ -216,14 +208,14 @@ export default function RemindersPage() {
                   </button>
                 </div>
               </div>
-            </div>
+            </SurfaceCard>
           ))
         )}
       </div>
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-2xl">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>
               {editing ? 'Edit Reminder' : 'Create Reminder'}
@@ -237,7 +229,7 @@ export default function RemindersPage() {
               <div className="space-y-2">
                 <Label className="text-xs font-semibold tracking-wider uppercase text-slate-500">Customer *</Label>
                 <Select value={form.customer_id} onValueChange={(val) => setForm({...form, customer_id: val})}>
-                  <SelectTrigger data-testid="reminder-customer-select" className="border-slate-200">
+                  <SelectTrigger data-testid="reminder-customer-select" className="h-11 rounded-xl border-slate-200">
                     <SelectValue placeholder="Select customer" />
                   </SelectTrigger>
                   <SelectContent>
@@ -255,7 +247,7 @@ export default function RemindersPage() {
                   <button
                     type="button"
                     data-testid="reminder-date-picker"
-                    className="w-full flex items-center gap-2 h-10 px-3 border border-slate-200 rounded-lg text-sm text-left hover:bg-slate-50 transition-colors"
+                    className="flex h-11 w-full items-center gap-2 rounded-xl border border-slate-200 px-3 text-left text-sm transition-colors hover:bg-slate-50"
                   >
                     <CalendarDays className="w-4 h-4 text-slate-400" />
                     {form.date ? format(form.date, 'PPP') : <span className="text-slate-400">Pick a date</span>}
@@ -279,7 +271,7 @@ export default function RemindersPage() {
                 onChange={(e) => setForm({...form, time: e.target.value})}
                 required
                 data-testid="reminder-time-input"
-                className="border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+                className="h-11 rounded-xl border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
               />
             </div>
             <div className="space-y-2">
@@ -291,26 +283,21 @@ export default function RemindersPage() {
                 rows={3}
                 required
                 data-testid="reminder-note-input"
-                className="border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] resize-none"
+                className="rounded-xl border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] resize-none"
               />
             </div>
             {error && <p className="text-sm text-red-600" data-testid="reminder-form-error">{error}</p>}
             <DialogFooter>
-              <button
-                type="button"
-                onClick={() => setDialogOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-              >
+              <SecondaryButton type="button" onClick={() => setDialogOpen(false)}>
                 Cancel
-              </button>
-              <button
+              </SecondaryButton>
+              <PrimaryButton
                 type="submit"
                 disabled={submitting || (!editing && !form.customer_id)}
                 data-testid="reminder-form-submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-[#0A2540] rounded-lg hover:bg-[#103154] transition-colors disabled:opacity-50"
               >
                 {submitting ? 'Saving...' : (editing ? 'Update' : 'Create')}
-              </button>
+              </PrimaryButton>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -318,7 +305,7 @@ export default function RemindersPage() {
 
       {/* Delete Confirmation */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent className="sm:max-w-sm rounded-2xl">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>Delete Reminder</DialogTitle>
             <DialogDescription>
@@ -326,16 +313,13 @@ export default function RemindersPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <button
-              onClick={() => setDeleteDialogOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-            >
+            <SecondaryButton onClick={() => setDeleteDialogOpen(false)}>
               Cancel
-            </button>
+            </SecondaryButton>
             <button
               onClick={handleDelete}
               data-testid="confirm-delete-reminder"
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-medium text-white transition-colors hover:bg-red-700"
             >
               Delete
             </button>

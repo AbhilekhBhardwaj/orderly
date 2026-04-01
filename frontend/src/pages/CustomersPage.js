@@ -4,6 +4,7 @@ import { Plus, Search, Edit2, Trash2, Users, Phone, Tag } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { EmptyState, PageHeader, PrimaryButton, SecondaryButton, SurfaceCard } from '@/components/app/SaasUI';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter
 } from '@/components/ui/dialog';
@@ -96,28 +97,22 @@ export default function CustomersPage() {
 
   if (loading) return (
     <div className="space-y-6 animate-pulse" data-testid="customers-loading">
-      <div className="h-8 bg-slate-200 rounded w-48"></div>
-      <div className="h-96 bg-slate-100 rounded-xl"></div>
+      <div className="h-8 bg-slate-200 rounded w-56"></div>
+      <div className="h-96 bg-slate-100 rounded-2xl"></div>
     </div>
   );
 
   return (
     <div className="space-y-6" data-testid="customers-page">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl sm:text-4xl tracking-tight font-semibold text-[#0F172A]" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            Customers
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">{customers.length} total customers</p>
-        </div>
-        <button
-          onClick={openCreate}
-          data-testid="add-customer-button"
-          className="bg-[#0A2540] text-white hover:bg-[#103154] rounded-lg px-4 py-2.5 font-medium transition-colors focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2 flex items-center gap-2 text-sm"
-        >
-          <Plus className="w-4 h-4" /> Add Customer
-        </button>
-      </div>
+      <PageHeader
+        title="Customers"
+        subtitle={`${customers.length} total customers`}
+        action={(
+          <PrimaryButton onClick={openCreate} data-testid="add-customer-button">
+            <Plus className="w-4 h-4" /> Add Customer
+          </PrimaryButton>
+        )}
+      />
 
       {/* Search */}
       <div className="relative max-w-sm">
@@ -126,20 +121,20 @@ export default function CustomersPage() {
           placeholder="Search customers..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 h-10 border-slate-200"
+          className="h-11 rounded-xl border-slate-200 pl-9"
           data-testid="customer-search-input"
         />
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden" data-testid="customers-table-container">
+      <SurfaceCard className="overflow-hidden" data-testid="customers-table-container">
         {filtered.length === 0 ? (
-          <div className="text-center py-16">
-            <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <p className="text-sm font-medium text-slate-900">No customers found</p>
-            <p className="text-sm text-slate-500 mt-1">
-              {search ? 'Try a different search term' : 'Add your first customer to get started'}
-            </p>
+          <div className="p-6">
+            <EmptyState
+              icon={Users}
+              title="No customers found"
+              description={search ? 'Try a different search term.' : 'Add your first customer to get started.'}
+            />
           </div>
         ) : (
           <Table>
@@ -154,7 +149,7 @@ export default function CustomersPage() {
             </TableHeader>
             <TableBody>
               {filtered.map((customer) => (
-                <TableRow key={customer.id} className="hover:bg-slate-50/50" data-testid={`customer-row-${customer.id}`}>
+                <TableRow key={customer.id} className="h-16 hover:bg-slate-50/60" data-testid={`customer-row-${customer.id}`}>
                   <TableCell className="font-medium text-slate-900">{customer.name}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1.5 text-slate-600 text-sm">
@@ -178,14 +173,14 @@ export default function CustomersPage() {
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => openEdit(customer)}
-                        className="p-2 rounded-lg hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700"
+                        className="p-2 rounded-xl hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700"
                         data-testid={`edit-customer-${customer.id}`}
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => { setDeleting(customer); setDeleteDialogOpen(true); }}
-                        className="p-2 rounded-lg hover:bg-red-50 transition-colors text-slate-500 hover:text-red-600"
+                        className="p-2 rounded-xl hover:bg-red-50 transition-colors text-slate-500 hover:text-red-600"
                         data-testid={`delete-customer-${customer.id}`}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -197,11 +192,11 @@ export default function CustomersPage() {
             </TableBody>
           </Table>
         )}
-      </div>
+      </SurfaceCard>
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-2xl">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>
               {editing ? 'Edit Customer' : 'Add Customer'}
@@ -219,7 +214,7 @@ export default function CustomersPage() {
                 placeholder="Customer name"
                 required
                 data-testid="customer-name-input"
-                className="border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+                className="h-11 rounded-xl border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
               />
             </div>
             <div className="space-y-2">
@@ -229,7 +224,7 @@ export default function CustomersPage() {
                 onChange={(e) => setForm({...form, phone: e.target.value})}
                 placeholder="+91 98765 43210"
                 data-testid="customer-phone-input"
-                className="border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+                className="h-11 rounded-xl border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
               />
             </div>
             <div className="space-y-2">
@@ -240,7 +235,7 @@ export default function CustomersPage() {
                 placeholder="Any notes about this customer..."
                 rows={3}
                 data-testid="customer-notes-input"
-                className="border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] resize-none"
+                className="rounded-xl border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] resize-none"
               />
             </div>
             <div className="space-y-2">
@@ -250,27 +245,18 @@ export default function CustomersPage() {
                 onChange={(e) => setForm({...form, tags: e.target.value})}
                 placeholder="VIP, Instagram, WhatsApp"
                 data-testid="customer-tags-input"
-                className="border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+                className="h-11 rounded-xl border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
               />
               <p className="text-xs text-slate-400">Separate tags with commas</p>
             </div>
             {error && <p className="text-sm text-red-600" data-testid="customer-form-error">{error}</p>}
             <DialogFooter>
-              <button
-                type="button"
-                onClick={() => setDialogOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-              >
+              <SecondaryButton type="button" onClick={() => setDialogOpen(false)}>
                 Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                data-testid="customer-form-submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-[#0A2540] rounded-lg hover:bg-[#103154] transition-colors disabled:opacity-50"
-              >
+              </SecondaryButton>
+              <PrimaryButton type="submit" disabled={submitting} data-testid="customer-form-submit">
                 {submitting ? 'Saving...' : (editing ? 'Update' : 'Create')}
-              </button>
+              </PrimaryButton>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -278,7 +264,7 @@ export default function CustomersPage() {
 
       {/* Delete Confirmation */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent className="sm:max-w-sm rounded-2xl">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>Delete Customer</DialogTitle>
             <DialogDescription>
@@ -286,16 +272,13 @@ export default function CustomersPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <button
-              onClick={() => setDeleteDialogOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-            >
+            <SecondaryButton onClick={() => setDeleteDialogOpen(false)}>
               Cancel
-            </button>
+            </SecondaryButton>
             <button
               onClick={handleDelete}
               data-testid="confirm-delete-customer"
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-medium text-white transition-colors hover:bg-red-700"
             >
               Delete
             </button>
